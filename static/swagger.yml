@@ -1,0 +1,83 @@
+openapi: '3.0.0'
+info:
+  title: URL Shortner API
+  description: API for shortening URLs
+  version: '1.0'
+servers:
+  - url: /
+
+components:
+  parameters:
+    shortcode:
+      name: "shortcode"
+      description: "shortcode of the url"
+      in: path
+      required: True
+      schema:
+        type: "string"
+        example : asd123
+
+  schemas:
+    information:
+      type: "object"
+      required:
+        - shortcode
+      properties:
+        url:
+          type: "string"
+          example : https://www.example.com/
+        shortcode:
+          type: "string"
+          example : asd123
+
+paths:
+
+  /shorten:
+    post:
+      tags:
+        - "Url"
+      summary: "Shorten URL"
+      description: "Shorten a long URL and get the corresponding short URL"
+      requestBody:
+        description: "Shortens the link"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "information"
+              $ref: "#/components/schemas/information"
+      responses:
+        "201":
+          description: "Successfully shortened the URL"  
+        "400":
+          description: "url not present"
+        "409":
+          description: "shortcode already in use"
+        "412":
+          description: "The provided shortcode is invalid"
+
+  '/{shortcode}':
+    get:
+      tags:
+        - Url
+      summary: "Gets url by shortcode"
+      parameters:
+        - $ref: "#/components/parameters/shortcode"
+      responses:
+        "302":
+          description: "Successfully extracted the url"
+        "404":
+          description: "The provided shortcode not found"
+        
+  '/{shortcode}/stats':
+    get:
+      tags:
+        - Url
+      summary: "Returns statistics of the shortcode"
+      parameters:
+        - $ref: "#/components/parameters/shortcode"
+      responses:
+        "200":
+          description: "Successfully returned the statistics"
+        "404":
+          description: "The provided shortcode not found"
